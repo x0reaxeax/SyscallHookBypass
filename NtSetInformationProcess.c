@@ -152,7 +152,7 @@ int main(void) {
     printf("[+] Successfully patched pointer to 'NtSetInformationProcess' at 0x%p\n", pCallInstPtr);
     printf("[+] New pointer value: 0x%08llX\n", ptrVal);
 
-    printf("\n[*] Press ENTER to call SetInformationProcess()..\n");
+    printf("\n[*] Press ENTER to call SetProcessInformation()..\n");
     char c = getchar();
 
     BOOL bBreakOnTermination = TRUE;
@@ -183,14 +183,14 @@ int main(void) {
             &bBreakOnTermination,
             sizeof(bBreakOnTermination)
     )) {
-        printf("[-] SetInformationProcess() failed: %lu\n", GetLastError());
+        printf("[-] SetProcessInformation() failed: %lu\n", GetLastError());
         return EXIT_FAILURE;
     }
 
     /// if it pulls through, you're gonna crash anyway,
     /// so anything below the call is pointless
 
-    printf("[+] SetInformationProcess() success\n");
+    printf("[+] SetProcessInformation() success\n");
 
     while (1);
 
