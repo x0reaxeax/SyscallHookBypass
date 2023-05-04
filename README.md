@@ -1,4 +1,6 @@
 # SyscallHookBypass
+
+### NtAllocateVirtualMemory
 Patches the `call` instruction at `kernelbase!VirtualAlloc+0x41` by placing legitimate NTAPI stub at the same address and moving the rest of the function down 8 bytes (stub size).  
 The `RIP` relative offset for `call QWORD PTR ds:[&ZwAllocateVirtualMemory]` is recalculated and the pointer to the NTAPI call is patched to always land at `syscall` instruction, effectively skipping over installed trampolines.  
 Stack trace of patched call:
@@ -13,3 +15,12 @@ Stack trace of patched call:
 ```
 
 Tested on Win10 x64 21H2 (19044.2728)
+
+### NtSetInformationProcess
+
+Patches the `call` instruction at `kernelbase!SetProcessInformation+0xDB`, ... blah, blah, same thing over and over again, you get the picture... in order to set current process as **critical**.  
+I took a lazy route with this one, because `SetProcessInformation` rejects `ProcessBreakOnTermination` flag, so in this one we're langing straight on top of the fugazi stub in `KernelBase`.  
+Since we're skipping all the meal prep that `SetProcessInformation` does before calling the NTCALL `NtSetInformationProcess`, we're gonna segfault very soon after returning from `NTDLL`, which will of course result in a BSOD with stopcode `CRITICAL_PROCESS_DIED`. The way around this is to patch all the conditional jumps inside `SetProcessInformation`, before the `call` takes place, but since the purpose of this is to BSOD anyway, it is literally pointless for me to bother with this.  
+
+Tested on Win10 x64 22H2 (19045.2728)
+KernelBase.dll version 10.0.19041.2728
