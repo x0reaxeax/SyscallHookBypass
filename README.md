@@ -22,5 +22,13 @@ Patches the `call` instruction at `kernelbase!SetProcessInformation+0xDB`, ... b
 I took a lazy route with this one, because `SetProcessInformation` rejects `ProcessBreakOnTermination` flag, so in this one we're langing straight on top of the fugazi stub in `KernelBase`.  
 Since we're skipping all the meal prep that `SetProcessInformation` does before calling the NTCALL `NtSetInformationProcess`, we're gonna segfault very soon after returning from `NTDLL`, which will of course result in a BSOD with stopcode `CRITICAL_PROCESS_DIED`. The way around this is to patch all the conditional jumps inside `SetProcessInformation`, before the `call` takes place, but since the purpose of this is to BSOD anyway, it is literally pointless for me to bother with this.  
 
-Tested on Win10 x64 22H2 (19045.2728)
+Tested on Win10 x64 22H2 (19045.2728)  
 KernelBase.dll version 10.0.19041.2728
+
+### NtWriteVirtualMemory
+
+Self-explanatory. Offset is `KERNELBASE.DLL!WriteProcessMemory+0xB7`.  
+Usage: `NtWriteVirtualMemory.exe <pid> <address>`  
+
+Tested on Win10 x64 21H2 (19044.2846) 
+KernelBase.dll version 10.0.19041.2788
